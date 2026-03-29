@@ -1,0 +1,110 @@
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router";
+import axios from "axios";
+import { API_BASE_URL } from "../Const";
+
+function PollResult() {
+  const { id } = useParams();
+  const [pollData, setPollData] = useState("");
+  const [pollOptionData, setPollOptionData] = useState([]);
+
+  useEffect(() => {
+    const fetchVoteData = async () => {
+      const res = await axios.get(`${API_BASE_URL}/getPollById/${id}`);
+      setPollData(res.data);
+
+      const response = await axios.get(`${API_BASE_URL}/getOptions/${id}`);
+      setPollOptionData(response.data);
+    };
+
+    fetchVoteData();
+  }, [id]);
+
+  const totalVotes = pollOptionData.reduce(
+    (sum, option) => sum + option.vote_count,
+    0,
+  );
+  console.log("Totalvotes ", totalVotes);
+
+  return (
+    <div className="pt-6 md:pt-10 bg-linear-to-br from-yellow-100 to-blue-300 min-h-screen px-3 md:px-0">
+      <div className="w-full md:w-4/6 p-4 md:p-6 m-auto bg-white rounded-xl">
+        <h1 className="text-xl md:text-2xl flex justify-center items-center font-bold">
+          Poll Result
+        </h1>
+
+        {/* Question */}
+        <div className="flex flex-col md:flex-row items-start md:items-center border border-gray-300 bg-blue-100 rounded-md overflow-hidden mt-6 md:mt-10 justify-between gap-2 md:gap-0 p-2 md:pr-2">
+          <div className="flex w-full">
+            <h1 className="bg-blue-500 text-white p-2 w-10 md:w-12 flex justify-center items-center">
+              Q
+            </h1>
+            <input
+              type="text"
+              className="w-full outline-none p-2 bg-blue-100 text-sm md:text-base"
+              value={pollData.poll_question}
+              disabled
+            />
+          </div>
+
+          <div className="text-sm md:text-base font-medium">
+            Total Votes : {totalVotes}
+          </div>
+        </div>
+
+        {/* Options + Graph */}
+        <div className="flex flex-col md:flex-row justify-between items-start mt-5 gap-5">
+          {/* Options */}
+          <div className="flex flex-col w-full md:w-6/12 gap-2">
+            {pollOptionData.map((p, i) => (
+              <div
+                key={i}
+                className="flex items-center border border-gray-300 rounded-md overflow-hidden"
+              >
+                <h1 className="bg-yellow-400 p-2 w-10 md:w-12 flex justify-center items-center font-medium">
+                  {i + 1}
+                </h1>
+
+                <div className="flex justify-between w-full items-center">
+                  <input
+                    type="text"
+                    className="w-full outline-none p-2 text-sm md:text-base"
+                    value={p.poll_option_name}
+                    readOnly
+                  />
+                  <h1 className="p-2 text-sm md:text-base">{p.vote_count}</h1>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Progress Bars */}
+          <div className="flex flex-col w-full md:w-5/12 gap-2">
+            {pollOptionData.map((p, i) => {
+              const percent = totalVotes
+                ? (p.vote_count * 100) / totalVotes
+                : 0;
+
+              return (
+                <div key={i} className="flex items-center gap-2 w-full">
+                  <div className="flex-1 bg-gray-300 rounded overflow-hidden">
+                    <div
+                      className="h-6 md:h-10 bg-yellow-400 rounded transition-all duration-500"
+                      style={{ width: `${percent}%` }}
+                    ></div>
+                  </div>
+
+                  <h1 className="w-10 text-right text-xs md:text-sm">
+                    {percent.toFixed(1)}%
+                  </h1>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default PollResult;
