@@ -12,7 +12,7 @@ function SharePoll() {
 
   const location = useLocation();
   const pollId = location.state;
-  const url = `${API_BASE_URL}/pollvote/${pollId}`;
+  const url = `${window.location.origin}/pollvote/${pollId}`;
 
   const copyToClipboard = async (text, type) => {
     await navigator.clipboard.writeText(text);

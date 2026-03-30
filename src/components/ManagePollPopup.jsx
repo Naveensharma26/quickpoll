@@ -11,7 +11,7 @@ function ManagePollPopup({ open, setOpen }) {
 
   const handleClickAndProceed = async () => {
     if (pollId && password) {
-      const response = await axios.get(`${API_BASE_URL}/${pollId}`);
+      const response = await axios.get(`${API_BASE_URL}/getPollById/${pollId}`);
       if (
         response.data.poll_id === pollId &&
         response.data.password === password
