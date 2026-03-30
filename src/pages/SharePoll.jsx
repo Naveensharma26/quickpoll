@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaRegClipboard, FaCheckCircle, FaRocket } from "react-icons/fa";
 import { IoIosShareAlt } from "react-icons/io";
 import { useLocation, useNavigate } from "react-router";
@@ -25,9 +25,20 @@ function SharePoll() {
     }
   };
 
+  useEffect(() => {
+    if (!pollId) {
+      // User refreshed or came here manually → send them home
+      navigate("/", { replace: true });
+    }
+  }, [pollId, navigate]);
+
   return (
     <div className="min-h-[calc(100vh-50px)] bg-linear-to-br from-yellow-100 to-blue-300  flex items-center justify-center p-4">
       <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full border border-slate-100 flex flex-col items-center text-center">
+        <p className="text-sm text-red-500 font-semibold mb-4">
+          ⚠️ Please note down your Poll ID — this page can't be accessed again!
+        </p>
+
         {/* Success Icon */}
         <div className="bg-blue-100 p-4 rounded-full mb-4">
           <FaRocket className="text-blue-600 text-3xl" />
@@ -80,8 +91,14 @@ function SharePoll() {
               {copiedUrl ? (
                 <FaCheckCircle className="text-green-600" />
               ) : (
-                <IoIosShareAlt className="text-slate-700" />
+                <FaRegClipboard className="text-slate-700" />
               )}
+            </button>
+            <button
+              onClick={() => window.open(url, "_blank")}
+              className="bg-red-200 hover:bg-slate-300 px-3 py-3 transition-colors flex items-center"
+            >
+              <IoIosShareAlt className="text-slate-600" />
             </button>
           </div>
         </div>

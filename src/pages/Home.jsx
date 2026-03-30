@@ -4,6 +4,7 @@ import CreatePollButton from "../components/CreatePollButton";
 import CreatePollPopup from "../components/CreatePollPopup";
 import ManagePollButton from "../components/ManagePollButton";
 import ManagePollPopup from "../components/ManagePollPopup";
+import Loader from "../components/Loader";
 
 function Home() {
   const [open, setOpen] = useState(false);

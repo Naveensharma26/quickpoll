@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router";
 import { AiOutlineThunderbolt } from "react-icons/ai";
 import axios from "axios";
 import { API_BASE_URL } from "../Const";
+import Loader from "../components/Loader";
 
 function CreatePoll() {
   const location = useLocation();
@@ -14,6 +15,7 @@ function CreatePoll() {
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(["", ""]);
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
 
   function getTodayDateAndTime() {
     const now = new Date();
@@ -38,6 +40,8 @@ function CreatePoll() {
     };
 
     try {
+      setShowLoader(true);
+
       const response = await axios.post(`${API_BASE_URL}/addPoll`, finalData);
 
       const optionsData = options.map((opt) => ({
@@ -46,12 +50,13 @@ function CreatePoll() {
         vote_count: 0,
       }));
 
-      const resp2 = await axios.post(`${API_BASE_URL}/addOptions`, optionsData);
-      console.log("Success:", response.data);
-      console.log("Success:", resp2.data);
+      await axios.post(`${API_BASE_URL}/addOptions`, optionsData);
+
       navigate("/sharePoll", { state: response.data.poll_id });
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setShowLoader(false);
     }
   };
 
@@ -146,6 +151,7 @@ function CreatePoll() {
           </button>
         </div>
       </div>
+      <Loader open={showLoader} />
     </div>
   );
 }

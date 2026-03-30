@@ -2,24 +2,33 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import axios from "axios";
 import { API_BASE_URL } from "../Const";
+import Loader from "../components/Loader";
 
 function PollResult() {
   const { id } = useParams();
   const [pollData, setPollData] = useState("");
   const [pollOptionData, setPollOptionData] = useState([]);
+  const [showLoader, setShowLoader] = useState(false);
 
   useEffect(() => {
     const fetchVoteData = async () => {
-      const res = await axios.get(`${API_BASE_URL}/getPollById/${id}`);
-      setPollData(res.data);
+      try {
+        setShowLoader(true);
 
-      const response = await axios.get(`${API_BASE_URL}/getOptions/${id}`);
-      setPollOptionData(response.data);
+        const res = await axios.get(`${API_BASE_URL}/getPollById/${id}`);
+        setPollData(res.data);
+
+        const response = await axios.get(`${API_BASE_URL}/getOptions/${id}`);
+        setPollOptionData(response.data);
+      } catch (error) {
+        console.error("Error fetching vote data:", error);
+      } finally {
+        setShowLoader(false);
+      }
     };
 
     fetchVoteData();
   }, [id]);
-
   const totalVotes = pollOptionData.reduce(
     (sum, option) => sum + option.vote_count,
     0,
@@ -103,6 +112,7 @@ function PollResult() {
           </div>
         </div>
       </div>
+      <Loader open={showLoader} />
     </div>
   );
 }

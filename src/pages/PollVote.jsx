@@ -4,6 +4,7 @@ import axios from "axios";
 import { AiOutlineThunderbolt } from "react-icons/ai";
 import VotingThanksPopup from "../components/VotingThanksPopup";
 import { API_BASE_URL } from "../Const";
+import Loader from "../components/Loader";
 
 function PollVote() {
   const { id } = useParams();
@@ -13,13 +14,23 @@ function PollVote() {
   const [selectedOption, setSelectedOption] = useState("");
   const [disableSubmit, setDisableSubmit] = useState(true);
   const [showThanksPopup, setShowThanksPopup] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await axios.get(`${API_BASE_URL}/getPollById/${id}`);
-      const res2 = await axios.get(`${API_BASE_URL}/getOptions/${id}`);
-      setPollData(res.data);
-      setPollOptions(res2.data);
+      try {
+        setShowLoader(true);
+
+        const res = await axios.get(`${API_BASE_URL}/getPollById/${id}`);
+        const res2 = await axios.get(`${API_BASE_URL}/getOptions/${id}`);
+
+        setPollData(res.data);
+        setPollOptions(res2.data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setShowLoader(false);
+      }
     };
 
     fetchData();
@@ -37,7 +48,7 @@ function PollVote() {
     if (disableSubmit) return;
 
     setDisableSubmit(true);
-
+    setShowLoader(true);
     const poll = pollOptions.find((p) => p.poll_option_name === selectedOption);
 
     const data = {
@@ -58,6 +69,7 @@ function PollVote() {
     await axios.put(`${API_BASE_URL}/updateCount`, data2);
 
     localStorage.setItem(`voted_${id}`, "Y");
+    setShowLoader(false);
     setShowThanksPopup(true);
   };
 
@@ -153,6 +165,7 @@ function PollVote() {
       </div>
 
       <VotingThanksPopup open={showThanksPopup} />
+      <Loader open={showLoader} />
     </div>
   );
 }
