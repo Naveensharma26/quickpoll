@@ -46,10 +46,7 @@ function CreatePoll() {
         vote_count: 0,
       }));
 
-      const resp2 = await axios.post(
-        `${API_BASE_URL}/addOptions`,
-        optionsData,
-      );
+      const resp2 = await axios.post(`${API_BASE_URL}/addOptions`, optionsData);
       console.log("Success:", response.data);
       console.log("Success:", resp2.data);
       navigate("/sharePoll", { state: response.data.poll_id });

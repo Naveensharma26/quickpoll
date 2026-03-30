@@ -39,7 +39,7 @@ function CreatePollPopup({ open, setOpen }) {
 
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-black/70 px-3">
-      <div className="bg-blue-500 p-5 md:p-6 rounded-xl w-full max-w-md border-white border-2 text-white">
+      <div className="bg-blue-500 p-5 md:p-6 rounded-xl w-full max-w-md border-white border-2 text-white ">
         <div className="flex justify-between items-center">
           <h1 className="text-xl md:text-2xl font-bold">Create Poll</h1>
           <IoMdCloseCircle
@@ -48,12 +48,11 @@ function CreatePollPopup({ open, setOpen }) {
             className="cursor-pointer"
           />
         </div>
-
         <div className="flex flex-col gap-4 mt-6">
           <div className="flex flex-col">
             <label className="text-sm md:text-base">Your Name:</label>
             <input
-              className="p-2 rounded border mt-1 outline-none text-black"
+              className="p-2 rounded border mt-1 outline-none text-white"
               type="text"
               value={userName}
               onChange={(e) => setUsername(e.target.value)}
@@ -63,7 +62,7 @@ function CreatePollPopup({ open, setOpen }) {
           <div className="flex flex-col">
             <label className="text-sm md:text-base">Poll Name:</label>
             <input
-              className="p-2 rounded border mt-1 outline-none text-black"
+              className="p-2 rounded border mt-1 outline-none text-white"
               type="text"
               value={pollName}
               onChange={(e) => setPollName(e.target.value)}
@@ -75,14 +74,13 @@ function CreatePollPopup({ open, setOpen }) {
               Poll Password:(Only you should know)
             </label>
             <input
-              className="p-2 rounded border mt-1 outline-none text-black"
+              className="p-2 rounded border mt-1 outline-none text-white"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
         </div>
-
         <div className="flex justify-center mt-5">
           <input
             type="button"
