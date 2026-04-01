@@ -11,11 +11,12 @@ function ManagePollPopup({ open, setOpen }) {
 
   const handleClickAndProceed = async () => {
     if (pollId && password) {
-      const response = await axios.get(`${API_BASE_URL}/getPollById/${pollId}`);
-      if (
-        response.data.poll_id === pollId &&
-        response.data.password === password
-      ) {
+      const data = {
+        poll_id: pollId,
+        password: password,
+      };
+      const response = await axios.post(`${API_BASE_URL}/verifyUser`, data);
+      if (response.data) {
         navigate(`/pollResult/${pollId}`);
       } else {
         alert("wrong password");

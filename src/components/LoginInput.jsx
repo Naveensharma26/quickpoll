@@ -32,7 +32,7 @@ function LoginInput() {
         justify-between items-center 
         gap-3 sm:gap-4 
         shadow-lg shadow-gray-600 
-        w-full sm:w-8/12 md:w-5/12 lg:w-5/12
+        w-full sm:w-8/12 md:w-6/12 lg:w-6/12
       "
       >
         <label className="text-yellow-200 text-lg sm:text-xl font-bold text-center">

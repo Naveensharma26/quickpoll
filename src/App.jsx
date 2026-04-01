@@ -10,17 +10,19 @@ import Result from "./pages/SharePoll";
 import PollResult from "./pages/PollResult";
 import SharePoll from "./pages/SharePoll";
 import PollVote from "./pages/PollVote";
+import Layout from "./components/Layout";
 
 function App() {
   return (
     <BrowserRouter>
-      <Header />
       <Routes>
-        <Route path="/" element={<Home />}></Route>
-        <Route path="/createpoll" element={<CreatePoll />} />
-        <Route path="/sharePoll" element={<SharePoll />} />
-        <Route path="/pollResult/:id" element={<PollResult />} />
-        <Route path="/pollvote/:id" element={<PollVote />} />
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/createpoll" element={<CreatePoll />} />
+          <Route path="/sharePoll" element={<SharePoll />} />
+          <Route path="/pollResult/:id" element={<PollResult />} />
+          <Route path="/pollvote/:id" element={<PollVote />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

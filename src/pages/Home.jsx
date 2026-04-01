@@ -5,28 +5,30 @@ import CreatePollPopup from "../components/CreatePollPopup";
 import ManagePollButton from "../components/ManagePollButton";
 import ManagePollPopup from "../components/ManagePollPopup";
 import Loader from "../components/Loader";
+import TrendingPolls from "../components/TrendingPolls";
+import Header from "../components/Header";
+import LeftPanel from "../components/LeftPanel";
 
 function Home() {
   const [open, setOpen] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
 
   return (
-    <div className="bg-linear-to-br from-yellow-100 to-blue-300 min-h-screen px-4 py-6">
-      <div className="mb-6">
-        <LoginInput />
+    <div className="flex flex-col md:flex-row">
+      {/* Left Panel */}
+      <div className="w-full md:w-3/12 md:min-h-screen">
+        <LeftPanel setOpen={setOpen} setManageOpen={setManageOpen} />
       </div>
 
-      {/* Buttons */}
-      <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-        <div className="w-full md:w-auto">
-          <CreatePollButton setOpen={setOpen} />
+      {/* Main Content */}
+      <div className="w-full md:w-9/12">
+        <div className="p-4">
+          <LoginInput />
         </div>
-
-        <div className="w-full md:w-auto">
-          <ManagePollButton setOpen={setManageOpen} />
-        </div>
+        <TrendingPolls />
       </div>
 
+      {/* Popups */}
       <CreatePollPopup open={open} setOpen={setOpen} />
       <ManagePollPopup open={manageOpen} setOpen={setManageOpen} />
     </div>

@@ -15,6 +15,7 @@ function CreatePoll() {
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(["", ""]);
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [isPublic, setIsPublic] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
 
   function getTodayDateAndTime() {
@@ -36,7 +37,8 @@ function CreatePoll() {
       ...pollData,
       poll_question: question,
       created_at: getTodayDateAndTime(),
-      is_anonymous: isAnonymous ? "Y" : "N",
+      is_anonymous: isPublic || isAnonymous ? "Y" : "N",
+      is_public: isPublic ? "Y" : "N",
     };
 
     try {
@@ -117,20 +119,41 @@ function CreatePoll() {
               )}
             </div>
           ))}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4  p-3 border-t border-gray-100">
+            {/* Public Poll Toggle */}
+            <div className="flex items-center gap-3">
+              <span className="text-gray-700 text-sm md:text-base">
+                Public Poll?
+              </span>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={isPublic}
+                  onChange={(e) => setIsPublic(e.target.checked)}
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+              </label>
+            </div>
 
-          {/* Anonymous */}
-          <div className="flex gap-2 items-center text-sm md:text-base">
-            <input
-              type="checkbox"
-              id="anonymous"
-              className="h-4 w-4"
-              checked={isAnonymous}
-              onChange={(e) => setIsAnonymous(e.target.checked)}
-            />
-            <label htmlFor="anonymous">Keep Poll Anonymous?</label>
+            {/* Anonymous Toggle */}
+            <div className="flex gap-2 items-center text-sm md:text-base">
+              <input
+                type="checkbox"
+                id="anonymous"
+                className={`h-4 w-4 accent-blue-500 ${isPublic ? "opacity-50 cursor-not-allowed" : ""}`}
+                checked={isPublic || isAnonymous}
+                onChange={(e) => setIsAnonymous(e.target.checked)}
+              />
+              <label
+                htmlFor="anonymous"
+                className="text-gray-700 cursor-pointer"
+              >
+                Keep Poll Anonymous?
+              </label>
+            </div>
           </div>
         </div>
-
         {/* Buttons */}
         <div className="flex flex-col md:flex-row gap-2 mt-4">
           <button
