@@ -22,6 +22,8 @@ function TrendingPolls() {
     fetchTrending();
   }, []);
 
+  if (trendingData.length === 0) return;
+
   return (
     <div className="w-full p-4 md:p-6 rounded-2xl bg-white/40 backdrop-blur-xl shadow-lg">
       {/* Header */}
