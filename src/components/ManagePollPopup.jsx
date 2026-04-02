@@ -12,7 +12,7 @@ function ManagePollPopup({ open, setOpen }) {
   const handleClickAndProceed = async () => {
     if (pollId && password) {
       const data = {
-        poll_id: pollId,
+        pollId: pollId,
         password: password,
       };
       const response = await axios.post(`${API_BASE_URL}/verifyUser`, data);

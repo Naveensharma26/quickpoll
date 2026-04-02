@@ -37,7 +37,7 @@ function PollVote() {
   }, [id]);
 
   useEffect(() => {
-    if (pollData.is_anonymous === "Y" && selectedOption) {
+    if (pollData.isAnonymous === "Y" && selectedOption) {
       setDisableSubmit(false);
     } else if (pollData.is_anonymous === "N" && votedBy && selectedOption) {
       setDisableSubmit(false);
@@ -49,24 +49,24 @@ function PollVote() {
 
     setDisableSubmit(true);
     setShowLoader(true);
-    const poll = pollOptions.find((p) => p.poll_option_name === selectedOption);
+    const poll = pollOptions.find((p) => p.pollOptionsId === selectedOption);
 
     const data = {
-      poll_option_name: selectedOption,
-      poll_option_id: poll?.poll_options_id,
-      voted_by: poll?.is_anonymous === "Y" ? "" : votedBy,
-      poll_id: id,
-    };
-
-    await axios.post(`${API_BASE_URL}/voteOption`, data);
-
-    const data2 = {
-      poll_options_id: poll?.poll_options_id,
+      pollOptionName: selectedOption,
+      pollOptionsId: poll?.pollOptionsId,
+      votedBy: poll?.isAnonymous === "Y" ? "" : votedBy,
       pollId: id,
-      vote_count: poll?.vote_count + 1,
     };
 
-    await axios.put(`${API_BASE_URL}/updateCount`, data2);
+    await axios.post(`${API_BASE_URL}/vote`, data);
+
+    // const data2 = {
+    //   pollOptionsId: poll?.polloptionsId,
+    //   pollId: id,
+    //   voteCount: poll?.voteCount + 1,
+    // };
+
+    // await axios.put(`${API_BASE_URL}/updateCount`, data2);
 
     localStorage.setItem(`voted_${id}`, "Y");
     setShowLoader(false);
@@ -85,13 +85,13 @@ function PollVote() {
       <div className="w-full md:w-4/6 p-4 md:p-6 m-auto bg-white border-slate-100 rounded-xl shadow-md">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
           <h1 className="text-lg md:text-2xl text-blue-600 font-bold">
-            Poll Name {pollData.poll_name}
+            Poll Name {pollData.pollName}
           </h1>
           <h1 className="text-gray-600 text-sm md:text-base">
-            Created By : {pollData.created_by}
+            Created By : {pollData.createdBy}
           </h1>
           <h1 className="text-gray-600 text-sm md:text-base">
-            Created On : {pollData.created_at}
+            Created On : {pollData.createdAt}
           </h1>
         </div>
 
@@ -116,7 +116,7 @@ function PollVote() {
             <input
               type="text"
               className="w-full outline-none p-2 bg-blue-50 text-sm md:text-base"
-              value={pollData.poll_question}
+              value={pollData.pollQuestion}
               disabled
             />
           </div>
@@ -133,14 +133,15 @@ function PollVote() {
 
               <input
                 type="text"
+                id={p.pollOptionsId}
                 className={`w-full outline-none p-2 cursor-pointer transition-all duration-200 text-sm md:text-base
               ${
-                selectedOption === p.poll_option_name
+                selectedOption === p.pollOptionsId
                   ? "bg-blue-500 text-white"
                   : "bg-white hover:bg-blue-100"
               }`}
-                onClick={(e) => setSelectedOption(e.target.value)}
-                value={p.poll_option_name}
+                onClick={() => setSelectedOption(p.pollOptionsId)}
+                value={p.pollOptionName}
                 readOnly
               />
             </div>

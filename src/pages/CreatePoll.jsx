@@ -18,27 +18,12 @@ function CreatePoll() {
   const [isPublic, setIsPublic] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
 
-  function getTodayDateAndTime() {
-    const now = new Date();
-
-    const day = String(now.getDate()).padStart(2, "0");
-    const month = String(now.getMonth() + 1).padStart(2, "0"); // months are 0-based
-    const year = now.getFullYear();
-
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    const seconds = String(now.getSeconds()).padStart(2, "0");
-
-    return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
-  }
-
   const handleCreatePoll = async () => {
     const finalData = {
       ...pollData,
-      poll_question: question,
-      created_at: getTodayDateAndTime(),
-      is_anonymous: isPublic || isAnonymous ? "Y" : "N",
-      is_public: isPublic ? "Y" : "N",
+      pollQuestion: question,
+      isAnonymous: isPublic || isAnonymous ? "Y" : "N",
+      isPublic: isPublic ? "Y" : "N",
     };
 
     try {
@@ -47,14 +32,14 @@ function CreatePoll() {
       const response = await axios.post(`${API_BASE_URL}/addPoll`, finalData);
 
       const optionsData = options.map((opt) => ({
-        poll_option_name: opt,
-        pollId: response.data.poll_id,
-        vote_count: 0,
+        pollOptionName: opt,
+        pollId: response.data.pollId,
+        voteCount: 0,
       }));
 
       await axios.post(`${API_BASE_URL}/addOptions`, optionsData);
 
-      navigate("/sharePoll", { state: response.data.poll_id });
+      navigate("/sharePoll", { state: response.data.pollId });
     } catch (error) {
       console.error("Error:", error);
     } finally {

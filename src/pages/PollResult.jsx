@@ -6,7 +6,8 @@ import Loader from "../components/Loader";
 
 function PollResult() {
   const { id } = useParams();
-  const [pollData, setPollData] = useState("");
+
+  const [pollData, setPollData] = useState({});
   const [pollOptionData, setPollOptionData] = useState([]);
   const [showLoader, setShowLoader] = useState(false);
 
@@ -16,9 +17,10 @@ function PollResult() {
         setShowLoader(true);
 
         const res = await axios.get(`${API_BASE_URL}/getPollById/${id}`);
-        setPollData(res.data);
-
         const response = await axios.get(`${API_BASE_URL}/getOptions/${id}`);
+
+        // ✅ Directly use response (already camelCase)
+        setPollData(res.data);
         setPollOptionData(response.data);
       } catch (error) {
         console.error("Error fetching vote data:", error);
@@ -29,11 +31,11 @@ function PollResult() {
 
     fetchVoteData();
   }, [id]);
+
   const totalVotes = pollOptionData.reduce(
-    (sum, option) => sum + option.vote_count,
+    (sum, option) => sum + option.voteCount,
     0,
   );
-  console.log("Totalvotes ", totalVotes);
 
   return (
     <div className="pt-6 md:pt-10 bg-linear-to-br from-yellow-100 to-blue-300 min-h-screen px-3 md:px-0">
@@ -43,31 +45,32 @@ function PollResult() {
         </h1>
 
         {/* Question */}
-        <div className="flex flex-col md:flex-row items-start md:items-center border border-gray-300 bg-blue-100 rounded-md overflow-hidden mt-6 md:mt-10 justify-between gap-2 md:gap-0 p-2 md:pr-2">
+        <div className="flex flex-col md:flex-row items-start md:items-center border border-gray-300 bg-blue-100 rounded-md overflow-hidden mt-6 md:mt-10 justify-between gap-2 md:gap-0  md:pr-2">
           <div className="flex w-full">
             <h1 className="bg-blue-500 text-white p-2 w-10 md:w-12 flex justify-center items-center">
               Q
             </h1>
+
             <input
               type="text"
               className="w-full outline-none p-2 bg-blue-100 text-sm md:text-base"
-              value={pollData.poll_question}
+              value={pollData.pollQuestion || ""}
               disabled
             />
           </div>
 
-          <div className="text-sm md:text-base font-medium">
+          <div className="text-sm md:text-base font-medium  w-40">
             Total Votes : {totalVotes}
           </div>
         </div>
 
-        {/* Options + Graph */}
+        {/* Options */}
         <div className="flex flex-col md:flex-row justify-between items-start mt-5 gap-5">
-          {/* Options */}
+          {/* Left: Options */}
           <div className="flex flex-col w-full md:w-6/12 gap-2">
             {pollOptionData.map((p, i) => (
               <div
-                key={i}
+                key={p.pollOptionsId || i}
                 className="flex items-center border border-gray-300 rounded-md overflow-hidden"
               >
                 <h1 className="bg-yellow-400 p-2 w-10 md:w-12 flex justify-center items-center font-medium">
@@ -78,21 +81,20 @@ function PollResult() {
                   <input
                     type="text"
                     className="w-full outline-none p-2 text-sm md:text-base"
-                    value={p.poll_option_name}
+                    value={p.pollOptionName}
                     readOnly
                   />
-                  <h1 className="p-2 text-sm md:text-base">{p.vote_count}</h1>
+
+                  <h1 className="p-2 text-sm md:text-base">{p.voteCount}</h1>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Progress Bars */}
+          {/* Right: Progress Bars */}
           <div className="flex flex-col w-full md:w-5/12 gap-2">
             {pollOptionData.map((p, i) => {
-              const percent = totalVotes
-                ? (p.vote_count * 100) / totalVotes
-                : 0;
+              const percent = totalVotes ? (p.voteCount * 100) / totalVotes : 0;
 
               return (
                 <div key={i} className="flex items-center gap-2 w-full">
@@ -112,6 +114,7 @@ function PollResult() {
           </div>
         </div>
       </div>
+
       <Loader open={showLoader} />
     </div>
   );

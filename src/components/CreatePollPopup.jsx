@@ -23,9 +23,9 @@ function CreatePollPopup({ open, setOpen }) {
   const handleClickAndProceed = () => {
     if (userName && pollName && password) {
       const pollData = {
-        poll_id: generateCode(),
-        created_by: userName,
-        poll_name: pollName,
+        pollId: generateCode(),
+        createdBy: userName,
+        pollName: pollName,
         password,
       };
 
