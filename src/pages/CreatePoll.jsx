@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoMdCloseCircle } from "react-icons/io";
 import { useLocation, useNavigate } from "react-router";
 import { AiOutlineThunderbolt } from "react-icons/ai";
@@ -17,6 +17,8 @@ function CreatePoll() {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isPublic, setIsPublic] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
+  const [duration, setDuration] = useState(24);
+  const [createDisabled, setIsCreateDisabled] = useState(true);
 
   const handleCreatePoll = async () => {
     const finalData = {
@@ -24,6 +26,7 @@ function CreatePoll() {
       pollQuestion: question,
       isAnonymous: isPublic || isAnonymous ? "Y" : "N",
       isPublic: isPublic ? "Y" : "N",
+      duration: duration,
     };
 
     try {
@@ -47,8 +50,19 @@ function CreatePoll() {
     }
   };
 
+  useEffect(() => {
+    // Check if all options have non-empty text
+    const allOptionsFilled = options.every((opt) => opt.trim() !== "");
+
+    if (question.trim() && options.length > 1 && allOptionsFilled && duration) {
+      setIsCreateDisabled(false);
+    } else {
+      setIsCreateDisabled(true);
+    }
+  }, [question, options, duration]);
+
   return (
-    <div className="flex justify-center items-center bg-linear-to-br from-yellow-100 to-blue-300 min-h-screen px-3">
+    <div className="flex justify-center items-center bg-linear-to-br from-yellow-100 to-blue-300 px-3 min-h-[calc(100vh-48px)]">
       <div className="p-4 md:p-6 m-auto w-full md:w-3/6 shadow-lg shadow-gray-500 bg-white rounded-xl">
         <h1 className="text-center text-xl md:text-2xl text-blue-500 font-bold">
           Add Poll Details
@@ -104,7 +118,24 @@ function CreatePoll() {
               )}
             </div>
           ))}
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4  p-3 border-t border-gray-100">
+          <div className="flex flex-row gap-2 mt-2">
+            <span className="text-gray-700 text-sm md:text-base">
+              Poll Duration ?
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {["6", "12", "24", "0"].map((time) => (
+                <button
+                  key={time}
+                  type="button"
+                  onClick={() => setDuration(time)}
+                  className={`px-4 py-1.5 rounded-md text-sm transition-all duration-200 border ${duration == time ? "bg-blue-400" : ""}`}
+                >
+                  {time === "0" ? "Never" : `${time} Hours`}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4  border-t border-gray-100">
             {/* Public Poll Toggle */}
             <div className="flex items-center gap-3">
               <span className="text-gray-700 text-sm md:text-base">
@@ -152,8 +183,9 @@ function CreatePoll() {
           </button>
 
           <button
-            className="bg-red-400 p-2 rounded-md cursor-pointer duration-300 shadow-gray-400 shadow hover:shadow-md flex justify-center items-center gap-2 text-white w-full md:w-auto"
+            className={`p-2 rounded-md cursor-pointer duration-300 shadow-gray-400 shadow hover:shadow-md flex justify-center items-center gap-2 text-white w-full md:w-auto ${createDisabled ? "bg-gray-400 cursor-not-allowed " : "bg-red-400 "}`}
             onClick={handleCreatePoll}
+            disabled={createDisabled}
           >
             Create Poll <AiOutlineThunderbolt />
           </button>

@@ -38,7 +38,7 @@ function PollResult() {
   );
 
   return (
-    <div className="pt-6 md:pt-10 bg-linear-to-br from-yellow-100 to-blue-300 min-h-screen px-3 md:px-0">
+    <div className="min-h-[calc(100vh-48px)] pt-6 md:pt-10 bg-linear-to-br from-yellow-100 to-blue-300  px-3 md:px-0">
       <div className="w-full md:w-4/6 p-4 md:p-6 m-auto bg-white rounded-xl">
         <h1 className="text-xl md:text-2xl flex justify-center items-center font-bold">
           Poll Result

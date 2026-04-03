@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoMdCloseCircle } from "react-icons/io";
 import { useNavigate } from "react-router";
 
@@ -7,6 +7,7 @@ function CreatePollPopup({ open, setOpen }) {
   const [userName, setUsername] = useState("");
   const [pollName, setPollName] = useState("");
   const [password, setPassword] = useState("");
+  const [createDisabled, setCreateDisabled] = useState(true);
 
   const generateCode = () => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -19,6 +20,14 @@ function CreatePollPopup({ open, setOpen }) {
 
     return result;
   };
+
+  useEffect(() => {
+    if (userName && pollName && password) {
+      setCreateDisabled(false);
+    } else {
+      setCreateDisabled(true);
+    }
+  }, [userName, pollName, password]);
 
   const handleClickAndProceed = () => {
     if (userName && pollName && password) {
@@ -85,8 +94,9 @@ function CreatePollPopup({ open, setOpen }) {
           <input
             type="button"
             value="Create & Proceed"
-            className="bg-red-400 text-white px-5 py-2 border rounded-xl w-full md:w-auto"
+            className={` text-white px-5 py-2 border rounded-xl w-full md:w-auto ${createDisabled ? "bg-gray-400 text-black" : "bg-red-400 "}`}
             onClick={handleClickAndProceed}
+            disabled={createDisabled}
           />
         </div>
       </div>

@@ -33,7 +33,7 @@ function SharePoll() {
   }, [pollId, navigate]);
 
   return (
-    <div className="min-h-[calc(100vh-50px)] bg-linear-to-br from-yellow-100 to-blue-300  flex items-center justify-center p-4">
+    <div className="min-h-[calc(100vh-48px)] bg-linear-to-br from-yellow-100 to-blue-300  flex items-center justify-center p-4">
       <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full border border-slate-100 flex flex-col items-center text-center">
         <p className="text-sm text-red-500 font-semibold mb-4">
           ⚠️ Please note down your Poll ID — this page can't be accessed again!

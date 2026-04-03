@@ -5,6 +5,7 @@ import { AiOutlineThunderbolt } from "react-icons/ai";
 import VotingThanksPopup from "../components/VotingThanksPopup";
 import { API_BASE_URL } from "../Const";
 import Loader from "../components/Loader";
+import ExpiredPopup from "../components/ExpiredPopup";
 
 function PollVote() {
   const { id } = useParams();
@@ -15,6 +16,7 @@ function PollVote() {
   const [disableSubmit, setDisableSubmit] = useState(true);
   const [showThanksPopup, setShowThanksPopup] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
+  const [isPollExpired, setIsPollExpired] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,12 +39,12 @@ function PollVote() {
   }, [id]);
 
   useEffect(() => {
-    if (pollData.isAnonymous === "Y" && selectedOption) {
+    if (!isPollExpired && pollData.isAnonymous === "Y" && selectedOption) {
       setDisableSubmit(false);
-    } else if (pollData.is_anonymous === "N" && votedBy && selectedOption) {
+    } else if (pollData.isAnonymous === "N" && votedBy && selectedOption) {
       setDisableSubmit(false);
     }
-  }, [selectedOption, votedBy, pollData]);
+  }, [selectedOption, votedBy, pollData, isPollExpired]);
 
   const handleSubmitClick = async () => {
     if (disableSubmit) return;
@@ -60,17 +62,42 @@ function PollVote() {
 
     await axios.post(`${API_BASE_URL}/vote`, data);
 
-    // const data2 = {
-    //   pollOptionsId: poll?.polloptionsId,
-    //   pollId: id,
-    //   voteCount: poll?.voteCount + 1,
-    // };
-
-    // await axios.put(`${API_BASE_URL}/updateCount`, data2);
-
     localStorage.setItem(`voted_${id}`, "Y");
     setShowLoader(false);
     setShowThanksPopup(true);
+  };
+
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    return date.toLocaleString();
+  };
+
+  const getTimeLeft = (expiry) => {
+    if (!expiry) return "Never ends";
+
+    const now = new Date();
+    const exp = new Date(expiry);
+
+    const diffMs = exp - now;
+
+    if (diffMs <= 0) return "Expired";
+
+    const minutes = Math.floor(diffMs / (1000 * 60));
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (minutes < 60) return `${minutes} min`;
+    if (hours < 24) return `${hours} hr`;
+    return `${days} d`;
+  };
+
+  const checkIsExpired = (expiry) => {
+    if (!expiry) return false;
+
+    const now = new Date();
+    const exp = new Date(expiry);
+
+    return exp <= now;
   };
 
   useEffect(() => {
@@ -80,23 +107,44 @@ function PollVote() {
     }
   }, [id]);
 
+  useEffect(() => {
+    setIsPollExpired(checkIsExpired(pollData.expiresAt));
+  }, [pollData]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsPollExpired(checkIsExpired(pollData.expiresAt));
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, [pollData]);
+
   return (
-    <div className="mt-10 md:mt-20 bg-gray-50 min-h-screen px-3">
+    <div className="mt-10 md:mt-20 bg-gray-50 min-h-[calc(100vh-48px)] px-3">
       <div className="w-full md:w-4/6 p-4 md:p-6 m-auto bg-white border-slate-100 rounded-xl shadow-md">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
           <h1 className="text-lg md:text-2xl text-blue-600 font-bold">
-            Poll Name {pollData.pollName}
+            {pollData.pollName}
           </h1>
           <h1 className="text-gray-600 text-sm md:text-base">
             Created By : {pollData.createdBy}
           </h1>
           <h1 className="text-gray-600 text-sm md:text-base">
-            Created On : {pollData.createdAt}
+            Created On : {formatDate(pollData.createdAt)}
           </h1>
         </div>
-
+        {pollData.expiresAt && !isPollExpired && (
+          <div className="flex flex-row justify-start my-2 md:justify-end text-red-500">
+            <h1>Poll expires in : {getTimeLeft(pollData.expiresAt)}</h1>
+          </div>
+        )}
+        {isPollExpired && (
+          <div className="flex flex-row justify-center text-red-500 font-bold my-2">
+            <h1>POLL IS EXPIRED , CAN'T VOTE NOW</h1>
+          </div>
+        )}
         <div className="flex flex-col gap-3 mt-6">
-          {pollData?.is_anonymous === "N" && (
+          {pollData?.isAnonymous === "N" && (
             <div className="w-full md:w-fit border-2 border-blue-500 rounded-md">
               <input
                 type="text"
@@ -167,6 +215,7 @@ function PollVote() {
 
       <VotingThanksPopup open={showThanksPopup} />
       <Loader open={showLoader} />
+      <ExpiredPopup open={isPollExpired} />
     </div>
   );
 }
