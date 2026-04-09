@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { IoMdCloseCircle } from "react-icons/io";
 import { useNavigate } from "react-router";
+import { ThemeContext } from "../contexts/ThemeContext";
 
 function CreatePollPopup({ open, setOpen }) {
   const navigate = useNavigate();
@@ -8,6 +9,8 @@ function CreatePollPopup({ open, setOpen }) {
   const [pollName, setPollName] = useState("");
   const [password, setPassword] = useState("");
   const [createDisabled, setCreateDisabled] = useState(true);
+
+  const { theme } = useContext(ThemeContext);
 
   const generateCode = () => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -48,7 +51,9 @@ function CreatePollPopup({ open, setOpen }) {
 
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-black/70 px-3">
-      <div className="bg-blue-500 p-5 md:p-6 rounded-xl w-full max-w-md border-white border-2 text-white ">
+      <div
+        className={`${theme === "dark" ? "bg-slate-800" : "bg-blue-500"} p-5 md:p-6 rounded-xl w-full max-w-md border-white border-2 text-white`}
+      >
         <div className="flex justify-between items-center">
           <h1 className="text-xl md:text-2xl font-bold">Create Poll</h1>
           <IoMdCloseCircle

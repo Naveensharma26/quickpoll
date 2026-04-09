@@ -1,13 +1,16 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { IoMdCloseCircle } from "react-icons/io";
 import { useNavigate } from "react-router";
 import { API_BASE_URL } from "../Const";
+import { ThemeContext } from "../contexts/ThemeContext";
 
 function ManagePollPopup({ open, setOpen }) {
   const [pollId, setPollId] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+
+  const { theme } = useContext(ThemeContext);
 
   const handleClickAndProceed = async () => {
     if (pollId && password) {
@@ -31,8 +34,9 @@ function ManagePollPopup({ open, setOpen }) {
 
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-black/70 px-3">
-      <div className="bg-amber-400 p-5 md:p-6 rounded-xl w-full max-w-md border-white border-2">
-        {/* Header */}
+      <div
+        className={`${theme === "dark" ? "bg-zinc-800 text-white" : "bg-amber-400"} p-5 md:p-6 rounded-xl w-full max-w-md border-white border-2`}
+      >
         <div className="flex justify-between items-center">
           <h1 className="text-xl md:text-2xl font-bold">Manage Poll</h1>
           <IoMdCloseCircle

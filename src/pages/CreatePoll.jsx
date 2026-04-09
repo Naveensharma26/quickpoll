@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { IoMdCloseCircle } from "react-icons/io";
 import { useLocation, useNavigate } from "react-router";
 import { AiOutlineThunderbolt } from "react-icons/ai";
 import axios from "axios";
 import { API_BASE_URL } from "../Const";
 import Loader from "../components/Loader";
+import { ThemeContext } from "../contexts/ThemeContext";
 
 function CreatePoll() {
   const location = useLocation();
@@ -20,6 +21,8 @@ function CreatePoll() {
   const [duration, setDuration] = useState(24);
   const [createDisabled, setIsCreateDisabled] = useState(true);
 
+  const { theme } = useContext(ThemeContext);
+
   const handleCreatePoll = async () => {
     const finalData = {
       ...pollData,
@@ -31,17 +34,13 @@ function CreatePoll() {
 
     try {
       setShowLoader(true);
-
       const response = await axios.post(`${API_BASE_URL}/addPoll`, finalData);
-
       const optionsData = options.map((opt) => ({
         pollOptionName: opt,
         pollId: response.data.pollId,
         voteCount: 0,
       }));
-
       await axios.post(`${API_BASE_URL}/addOptions`, optionsData);
-
       navigate("/sharePoll", { state: response.data.pollId });
     } catch (error) {
       console.error("Error:", error);
@@ -51,9 +50,7 @@ function CreatePoll() {
   };
 
   useEffect(() => {
-    // Check if all options have non-empty text
     const allOptionsFilled = options.every((opt) => opt.trim() !== "");
-
     if (question.trim() && options.length > 1 && allOptionsFilled && duration) {
       setIsCreateDisabled(false);
     } else {
@@ -62,41 +59,73 @@ function CreatePoll() {
   }, [question, options, duration]);
 
   return (
-    <div className="flex justify-center items-center bg-linear-to-br from-yellow-100 to-blue-300 px-3 min-h-[calc(100vh-48px)]">
-      <div className="p-4 md:p-6 m-auto w-full md:w-3/6 shadow-lg shadow-gray-500 bg-white rounded-xl">
-        <h1 className="text-center text-xl md:text-2xl text-blue-500 font-bold">
+    <div
+      className={`flex justify-center items-center px-3 min-h-[calc(100vh-48px)] transition-colors duration-500 ${
+        theme === "dark"
+          ? "bg-linear-to-br from-blue-950 via-slate-900 to-blue-950 text-white"
+          : "bg-linear-to-br from-yellow-100 to-blue-300"
+      }`}
+    >
+      <div
+        className={`p-4 md:p-6 m-auto w-full md:w-3/6 rounded-xl shadow-lg transition-all ${
+          theme === "dark" ? "bg-black border-white border" : "bg-white"
+        }`}
+      >
+        <h1 className="text-center text-xl md:text-2xl text-blue-500 font-bold mb-6">
           Add Poll Details
         </h1>
 
-        <div className="flex flex-col gap-3 mt-4">
-          {/* Question */}
-          <div className="flex items-center border rounded-md overflow-hidden">
-            <h1 className="bg-red-400 p-2 w-10 md:w-12 flex justify-center items-center">
+        <div className="flex flex-col gap-4 mt-4">
+          {/* Question Section - Following PollResult 'Q' styling */}
+          <div
+            className={`flex items-center border rounded-md overflow-hidden ${
+              theme === "dark"
+                ? "border-gray-600 bg-blue-950"
+                : "border-gray-300 bg-blue-50"
+            }`}
+          >
+            <h1 className="bg-red-400 text-white p-2 w-10 md:w-12 flex justify-center items-center font-bold">
               Q
             </h1>
             <input
               type="text"
               placeholder="Type Your Question ?"
-              className="w-full outline-0 p-2 text-sm md:text-base"
+              className={`w-full outline-0 p-2 text-sm md:text-base bg-transparent ${
+                theme === "dark"
+                  ? "text-white placeholder:text-slate-500"
+                  : "text-gray-800"
+              }`}
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
             />
           </div>
 
-          {/* Options */}
+          {/* Options Section - Following PollResult numeric badge styling */}
           {Array.from({ length: optionCount }).map((_, index) => (
             <div
               key={index}
-              className="flex items-center border pr-2 rounded-md overflow-hidden"
+              className={`flex items-center border pr-2 rounded-md overflow-hidden transition-all ${
+                theme === "dark" ? "border-white/20" : "border-gray-300"
+              }`}
             >
-              <h1 className="bg-blue-400 p-2 w-10 md:w-12 flex justify-center items-center">
+              <h1
+                className={`${
+                  theme === "dark"
+                    ? "bg-yellow-600 text-black"
+                    : "bg-yellow-400 text-black"
+                } p-2 w-10 md:w-12 flex justify-center items-center font-black`}
+              >
                 {index + 1}
               </h1>
 
               <input
                 type="text"
                 placeholder={`Option ${index + 1}`}
-                className="w-full outline-0 p-2 text-sm md:text-base"
+                className={`w-full outline-0 p-2 text-sm md:text-base bg-transparent ${
+                  theme === "dark"
+                    ? "text-white placeholder:text-slate-600"
+                    : "text-gray-800"
+                }`}
                 value={options[index]}
                 onChange={(e) => {
                   const newOptions = [...options];
@@ -108,7 +137,7 @@ function CreatePoll() {
               {index > 1 && (
                 <IoMdCloseCircle
                   size={22}
-                  className="cursor-pointer"
+                  className={`${theme === "dark" ? "text-red-500/70" : "text-red-400"} cursor-pointer hover:scale-110 transition-transform`}
                   onClick={() => {
                     const newOptions = options.filter((_, i) => i !== index);
                     setOptions(newOptions);
@@ -118,9 +147,13 @@ function CreatePoll() {
               )}
             </div>
           ))}
-          <div className="flex flex-row gap-2 mt-2">
-            <span className="text-gray-700 text-sm md:text-base">
-              Poll Duration ?
+
+          {/* Poll Duration */}
+          <div className="flex flex-col gap-2 mt-2">
+            <span
+              className={`text-sm md:text-base font-medium ${theme === "dark" ? "text-slate-300" : "text-gray-700"}`}
+            >
+              Poll Duration
             </span>
             <div className="flex flex-wrap gap-2">
               {["6", "12", "24", "0"].map((time) => (
@@ -128,17 +161,30 @@ function CreatePoll() {
                   key={time}
                   type="button"
                   onClick={() => setDuration(time)}
-                  className={`px-4 py-1.5 rounded-md text-sm transition-all duration-200 border ${duration == time ? "bg-blue-400" : ""}`}
+                  className={`px-4 py-1.5 rounded-md text-sm transition-all duration-200 border ${
+                    duration == time
+                      ? "bg-blue-500 text-white border-blue-500"
+                      : theme === "dark"
+                        ? "border-slate-700 bg-slate-900 text-slate-300 hover:border-blue-400"
+                        : "border-gray-300 text-gray-700 hover:border-blue-400"
+                  }`}
                 >
                   {time === "0" ? "Never" : `${time} Hours`}
                 </button>
               ))}
             </div>
           </div>
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4  border-t border-gray-100">
-            {/* Public Poll Toggle */}
+
+          {/* Toggles Section */}
+          <div
+            className={`flex flex-col md:flex-row items-center justify-between gap-4 py-4 border-t ${
+              theme === "dark" ? "border-slate-800" : "border-gray-100"
+            }`}
+          >
             <div className="flex items-center gap-3">
-              <span className="text-gray-700 text-sm md:text-base">
+              <span
+                className={`${theme === "dark" ? "text-slate-300" : "text-gray-700"} text-sm md:text-base`}
+              >
                 Public Poll?
               </span>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -148,11 +194,10 @@ function CreatePoll() {
                   checked={isPublic}
                   onChange={(e) => setIsPublic(e.target.checked)}
                 />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                <div className="w-11 h-6 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
               </label>
             </div>
 
-            {/* Anonymous Toggle */}
             <div className="flex gap-2 items-center text-sm md:text-base">
               <input
                 type="checkbox"
@@ -163,17 +208,22 @@ function CreatePoll() {
               />
               <label
                 htmlFor="anonymous"
-                className="text-gray-700 cursor-pointer"
+                className={`${theme === "dark" ? "text-slate-300" : "text-gray-700"} cursor-pointer`}
               >
                 Keep Poll Anonymous?
               </label>
             </div>
           </div>
         </div>
-        {/* Buttons */}
-        <div className="flex flex-col md:flex-row gap-2 mt-4">
+
+        {/* Action Buttons */}
+        <div className="flex flex-col md:flex-row gap-3 mt-4">
           <button
-            className="bg-blue-400 p-2 rounded-md cursor-pointer duration-300 shadow-gray-400 shadow hover:shadow-md w-full md:w-auto"
+            className={`p-2 px-6 rounded-md cursor-pointer duration-300 font-bold shadow-md w-full md:w-auto ${
+              theme === "dark"
+                ? "bg-slate-800 text-white hover:bg-slate-700"
+                : "bg-blue-400 text-white hover:bg-blue-500"
+            }`}
             onClick={() => {
               setOptionCount(optionCount + 1);
               setOptions([...options, ""]);
@@ -183,7 +233,11 @@ function CreatePoll() {
           </button>
 
           <button
-            className={`p-2 rounded-md cursor-pointer duration-300 shadow-gray-400 shadow hover:shadow-md flex justify-center items-center gap-2 text-white w-full md:w-auto ${createDisabled ? "bg-gray-400 cursor-not-allowed " : "bg-red-400 "}`}
+            className={`p-2 px-6 rounded-md cursor-pointer duration-300 shadow-md flex justify-center items-center gap-2 text-white font-bold w-full md:w-auto transition-all ${
+              createDisabled
+                ? "bg-gray-400 cursor-not-allowed opacity-50"
+                : "bg-red-500 hover:bg-red-600 active:scale-95"
+            }`}
             onClick={handleCreatePoll}
             disabled={createDisabled}
           >
