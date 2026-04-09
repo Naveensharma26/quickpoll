@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import CreatePollButton from "./CreatePollButton";
 import ManagePollButton from "./ManagePollButton";
 import DarkModeCheckbox from "./DarkModeCheckbox";
